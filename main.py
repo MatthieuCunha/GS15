@@ -1,3 +1,4 @@
+from makePKI import createPKI
 
 # fonction qui fera office de retour au menu
 def introduction():
@@ -13,7 +14,8 @@ def introduction():
     print(choice)
     # pas de switch propre en python donc c'est parti pour l'empilement de if !
     if choice=='1':
-        print('Création PKI')
+        createPKI()
+        print('KeyPair généré et placer dans 2 fichier')
     elif choice=='2':
         print('Création Certificat')
     elif choice=='3':

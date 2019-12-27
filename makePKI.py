@@ -1,14 +1,12 @@
 from random import getrandbits, randrange
 
-
-# Genere un couple clé public/privé et les stocks dans deux fichier
-tailleP = 256 #nomdre de bit pour generer les nombres premier
+tailleP = 64 #nomdre de bit pour generer les nombres premier
 RMCheck = 128 #nombre de verification avec rabinMiller
 
 # algo de rabin-miller de test de primalité
 def rabinMiller(PrimeCandidate):
-    #si pair, pas premier
-    if PrimeCandidate%2==0:
+    #si pair, pas premier, les nombres trop petit causes des problemes
+    if PrimeCandidate%2==0 or PrimeCandidate<10:
         return False
 
     s = 0
@@ -46,22 +44,49 @@ def createPrime():
     print("prime found ",number) # print de debug
     return number #retourne le nombre premier
 
-#Genere le couple de clé
+
+def bezout(p,q):
+    if p==0:
+        return (q,0,1)
+    else:
+        g,y,x=bezout(q%p,p)
+        return (g,x-(q//p)*y,y)
+
+def invmod(C,M): #inverse modulaire
+    g,x,y=bezout(C,M)
+    if g!=1:
+        raise Exception('pas inversible')
+    else:
+        return x%M
+
+# Genere un couple clé public/privé et les stocks dans deux fichier
 def createPKI():
     P=createPrime()
     Q=createPrime()
     N=P*Q
-    M=P-1*Q-1 #indicateur euler
+    print('P '+str(P))
+    print('Q '+str(Q))
+    M=(P-1)*(Q-1) #indicateur euler
+    print('M '+str(M))
 
-    C=createPrime() #pas besoin d'etre prime, mais de cette facon si C ne divise pas M alors ils sont premier entre eux
-    while M%C==0
+    C=createPrime() #pas besoin d'etre prime, mais de cette facon si C ne divise pas M alors ils sont premier entre eux, et la fonction est déja la
+    while M%C == 0:
         C=createPrime()
         print('pas premier entre eux') #print de debug
 
 #public N,C
-publicKeyFile = open("publicKey", "w")
-f.write("N=",N)
-f.write("C=",C)
-f.close()
+    publicKeyFile = open("publicKey", "w")
+    publicKeyFile.write("N="+str(N)+"\n")
+    publicKeyFile.write("C="+str(C))
+    publicKeyFile.close()
+
+# section creation clé privé
+
+    U=invmod(C,M)
+    print('U '+str(U))
+    privateKeyFile = open("privatekey", "w")
+    privateKeyFile.write("U="+str(U)+"\n")
+    privateKeyFile.write("N="+str(N))
+    privateKeyFile.close()
 
 createPKI()
