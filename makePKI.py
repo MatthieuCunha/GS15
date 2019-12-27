@@ -1,7 +1,29 @@
 from random import getrandbits, randrange
+from secrets import randbits
 
-tailleP = 64 #nomdre de bit pour generer les nombres premier
+tailleP = 512 #nomdre de bit pour generer les nombres premier
 RMCheck = 128 #nombre de verification avec rabinMiller
+
+
+# verifie que le nombre premier est plus grand que la moyenne des 2 premiers les plus proches de lui
+def strongPrime(PrimeCandidate):
+    # Initialize previous_prime to n - 1
+    # and next_prime to n + 1
+    previous_prime = PrimeCandidate - 1
+    next_prime = PrimeCandidate + 1
+    # Find next prime number
+    while (rabinMiller(next_prime) == False):
+        next_prime += 1
+    # Find previous prime number
+    while (rabinMiller(previous_prime) == False):
+        previous_prime -= 1
+    # Arithmetic mean
+    mean = (previous_prime + next_prime) / 2
+    # If n is a strong prime
+    if (PrimeCandidate > mean):
+        return True
+    else:
+        return False
 
 # algo de rabin-miller de test de primalité
 def rabinMiller(PrimeCandidate):
@@ -35,10 +57,10 @@ def rabinMiller(PrimeCandidate):
 def createPrime():
     isPrime =False
     while isPrime==False:
-        number = getrandbits(tailleP)
+        number = randbits(tailleP)
         number = (number & ~1) | 1 #passe le LSB a 1 pour eviter les nombres pair
         print("*",end="", flush=True)
-        if rabinMiller(number):
+        if rabinMiller(number) and strongPrime(number):
             isPrime=True
 
     print("prime found ",number) # print de debug
@@ -80,13 +102,10 @@ def createPKI():
     publicKeyFile.write("C="+str(C))
     publicKeyFile.close()
 
-# section creation clé privé
-
+# section creation clé privé U,N
     U=invmod(C,M)
     print('U '+str(U))
-    privateKeyFile = open("privatekey", "w")
+    privateKeyFile = open("privateKey", "w")
     privateKeyFile.write("U="+str(U)+"\n")
     privateKeyFile.write("N="+str(N))
     privateKeyFile.close()
-
-createPKI()
