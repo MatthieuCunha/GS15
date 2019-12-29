@@ -9,7 +9,8 @@ a = 0 # represente ce que la personne 1 memorise entre les etapes
 def retourPersonne1(B):
     k=pow_mod(B,a,p)
     print('personne 1 trouve k '+str(k))
-    publicKeyFile = open("Secretkey", "w")
+    print('la cle fait '+str(k.bit_length())+' bits') # affichage taille en bit de la clé
+    publicKeyFile = open("SecretKey", "w")
     publicKeyFile.write(str(k))
 
 def addSecondLock(p,g,A): #genere secret personne 2 et envoi retourne g^b
@@ -21,7 +22,6 @@ def addSecondLock(p,g,A): #genere secret personne 2 et envoi retourne g^b
 
 #creation des elemnts de l'échange et ajout du premier lock
 def createSecret():
-    Key = randbits(KeySize)
     global p
     p=createPrime() #prime du groupe
     g=randbelow(p-1) #generateur
