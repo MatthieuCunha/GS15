@@ -3,14 +3,14 @@
 #code récupéré sur github car je comprends rien a l'algo de toute facon.
 
 from random import randrange
-from hash import hashTexte
 from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
 from hashlib import sha1
+from hashTexte import hashTexte
 
 N = 160
 L = 1024
 
-#generation des parametres et des nombres premier du code github, pas de la fonction makePKI, car celle ci est bien plus rapide
+#generation des parametres et des nombres premier du code github, pas de la fonction makePKI, car celle ci semble bien plus rapide
 def generate_p_q(L, N):
     g = N  # g >= 160
     n = (L - 1) // g
@@ -19,9 +19,9 @@ def generate_p_q(L, N):
         # generate q
         while True:
             s = xmpz(randrange(1, 2 ** (g)))
-            a = sha1(to_binary(s)).hexdigest()
+            a = hashTexte(to_binary(s))
             zz = xmpz((s + 1) % (2 ** g))
-            z = sha1(to_binary(zz)).hexdigest()
+            z = hashTexte(to_binary(zz))
             U = int(a, 16) ^ int(z, 16)
             mask = 2 ** (N - 1) + 1
             q = U | mask
@@ -34,7 +34,7 @@ def generate_p_q(L, N):
             V = []
             for k in range(n + 1):
                 arg = xmpz((s + j + k) % (2 ** g))
-                zzv = sha1(to_binary(arg)).hexdigest()
+                zzv = hashTexte(to_binary(arg))
                 V.append(int(zzv, 16))
             W = 0
             for qq in range(0, n):
@@ -62,7 +62,11 @@ def generate_g(p, q):
 
 def generate_keys(g, p, q):
     x = randrange(2, q)  # x < q
+    certificat = open("certificateurPrivateKey", "w")
+    certificat.write(str(x))
     y = powmod(g, x, p)
+    certificat = open("certificateurPublicKey", "w")
+    certificat.write(str(y)+'\n')
     return x, y
 
 
@@ -78,7 +82,7 @@ def sign(M, p, q, g, x):
     while True:
         k = randrange(2, q)  # k < q
         r = powmod(g, k, p) % q
-        m = int(sha1(M).hexdigest(), 16)
+        m = int(hashTexte(M), 16)
         try:
             s = (invert(k, q) * (m + x * r)) % q
             return r, s
@@ -87,6 +91,11 @@ def sign(M, p, q, g, x):
 
 
 def verify(M, r, s, p, q, g, y):
+    p=xmpz(p)
+    q=xmpz(q)
+    g=xmpz(g)
+    r=xmpz(r)
+    y=xmpz(y)
     if not validate_params(p, q, g):
         raise Exception("Invalid params")
     if not validate_sign(r, s, q):
@@ -95,7 +104,7 @@ def verify(M, r, s, p, q, g, y):
         w = invert(xmpz(s), xmpz(q))
     except ZeroDivisionError:
         return False
-    m = int(sha1(M).hexdigest(), 16)
+    m = int(hashTexte(M), 16)
     u1 = (m * w) % q
     u2 = (r * w) % q
     # v = ((g ** u1 * y ** u2) % p) % q
@@ -121,11 +130,11 @@ def validate_sign(r, s, q):
     return True
 
 
-p, q, g = generate_params(L, N)
+p, q, g = generate_params(L, N) # sont des parametres de l'algo et donc librement partagé
 x, y = generate_keys(g, p, q)
 
 
-def signer(texte):
+def signerMessage(texte):
     r, s = sign(texte.encode(), p, q, g, x)
     print('r= '+str(r))
     print('s= '+str(s))
@@ -143,3 +152,14 @@ def verifierSignature(texte):
         print('signature valide')
     else:
         print('signature invalide')
+
+
+def signerCle(publicKey):
+    r, s = sign(publicKey.encode(), p, q, g, x)
+    certificat = open("Certificat", "w")
+    certificat.write(str(y)+'\n')
+    certificat.write(str(p) + '\n')
+    certificat.write(str(q) + '\n')
+    certificat.write(str(g) + '\n')
+    certificat.write(str(r) + "\n")
+    certificat.write(str(s)+'\n')

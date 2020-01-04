@@ -3,7 +3,7 @@
 from makePKI import createPKI
 from SendSecretKey import createSecret
 from Camellia import camellia
-from Signature import signer,verifierSignature
+from Signature import signerMessage,verifierSignature, signerCle,verify
 
 # fonction qui fera office de retour au menu
 def introduction():
@@ -26,8 +26,29 @@ def introduction():
             print('KeyPair généré et placer dans 2 fichier')
         elif choice=='2':
             print('Création Certificat')
+            texteFile = open("publicKeyServeur", "r")
+            texte = texteFile.read()
+            signerCle(texte)
         elif choice=='3':
             print('Check certificat')
+            #recuperation de la clé public sur site
+            texteFile = open("publicKeyServeur", "r")
+            pubS = texteFile.read()
+            # 'utilisateur recupere les parametres dans le certificat
+            texteFile = open("Certificat", "r")
+            pubC = texteFile.readline()
+            p = texteFile.readline()
+            q = texteFile.readline()
+            g = texteFile.readline()
+            r = texteFile.readline()
+            s = texteFile.readline()
+            # il utilise les parametres pour verifier si la signature correspond à la clé donné par le serveur
+            valide=verify(pubS.encode(),r,s,p,q,g,pubC)
+            if(valide):
+                print('certificat valide')
+            else:
+                print('certificat non valide')
+
         elif choice=='4':
             createSecret()
             print('Partage Clé secrete')
@@ -38,14 +59,57 @@ def introduction():
             print('Signature message')
             texteFile = open("baseTexte.txt", "r")
             texte=texteFile.read()
-            signer(texte)
+            signerMessage(texte)
         elif choice=='7':
             print('Verification Signature')
             texteFile = open("baseTexte.txt", "r")
             texte = texteFile.read()
             verifierSignature(texte)
         elif choice=='8':
-            print('tout ? maybe ?')
+            print('?')
+            createPKI()
+            print('KeyPair généré et placer dans 2 fichier')
+
+            print('Création Certificat')
+            texteFile = open("publicKeyServeur", "r")
+            texte = texteFile.read()
+            signerCle(texte)
+
+            print('Check certificat')
+            # recuperation de la clé public sur site
+            texteFile = open("publicKeyServeur", "r")
+            pubS = texteFile.read()
+            # 'utilisateur recupere les parametres dans le certificat
+            texteFile = open("Certificat", "r")
+            pubC = texteFile.readline()
+            p = texteFile.readline()
+            q = texteFile.readline()
+            g = texteFile.readline()
+            r = texteFile.readline()
+            s = texteFile.readline()
+            # il utilise les parametres pour verifier si la signature correspond à la clé donné par le serveur
+            valide = verify(pubS.encode(), r, s, p, q, g, pubC)
+            if (valide):
+                print('certificat valide')
+            else:
+                print('certificat non valide')
+
+            print('Partage Clé secrete')
+            createSecret()
+
+            print('Chiffrement message')
+            camellia()
+
+            print('Signature message')
+            texteFile = open("baseTexte.txt", "r")
+            texte = texteFile.read()
+            signerMessage(texte)
+
+            print('Verification Signature')
+            texteFile = open("baseTexte.txt", "r")
+            texte = texteFile.read()
+            verifierSignature(texte)
+
         elif choice=='9':
             print('byebye')
         else:

@@ -1,5 +1,8 @@
 # coding=utf-8
 
+import binascii
+
+
 keySize=128 # nombre de bit attendu pour la clé
 k=0 # key used by camellia
 
@@ -69,7 +72,7 @@ def itobin(i):
 # binary to string
 def bintostr(b):
     n = int(b, 2)
-    return ''.join(chr(int(b[i: i + 8], 2)) for i in xrange(0, len(b), 8))
+    return ''.join(chr(int(b[i: i + 8], 2)) for i in range(0, len(b), 8))
 
 # substitu la tValue par le resultat correspondant a la sbox, a faire plus tard si j'y pense
 def SBOX(boxNumber,tValue):
@@ -341,17 +344,40 @@ def camelliaDecrypt():
 	   texte=texteFile.read(16)
 
 
+# chiffre et dechiffre le message avec la library C camellia, car le code en haut ne marche pas
 def camellia():
 	f = open("SecretKey", "r")
 	fullK = int(f.read())
 	resizeKey(fullK)
-	print('la clé redimensionné est '+str(k)) ## print de debug
+	#print('la clé redimensionné est '+str(k)) ## print de debug
 
-	#camelliaEncrypt()
-	#print('Choix du mode 1)ECD 2)CBC 3)PCBC')
-	#choice = int(input ('Option :'))
+	import camellia
+
+	mode=camellia.MODE_ECB # defaut mode
+	print('Choix du mode 1)ECB 2)CBC 3)CTR ')
+	choice = int(input ('Option :'))
+	if choice=='1':
+		mode=camellia.MODE_ECB
+	elif choice=='2':
+		mode = camellia.MODE_CBC
+	elif choice == '3':
+		mode=camellia.MODE_CTR
+
+	texteFile = open("baseTexte.txt", "r")
+	texte = texteFile.read()
+
+	missingPad=16-len(texte)%16 # pad le texte si pas multiple de 16
+	if(missingPad != 0):
+		texte += " "*missingPad
 
 
+	cle=k.to_bytes(16,'big')
 
-camellia()
-#camelliaDecrypt()
+	c=camellia.CamelliaCipher(key=cle,IV=cle,mode=mode)
+	ec=c.encrypt(bytes(texte,'UTF-8'))
+	f = open("EncryptedTexte", "w")
+	f.write(str(ec))
+
+	dc=c.decrypt(ec)
+	f = open("DecryptedTexte", "w")
+	f.write(str(dc.decode('UTF-8')))
