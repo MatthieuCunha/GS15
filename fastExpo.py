@@ -1,3 +1,4 @@
+# coding=utf-8
 
 #expo rapide avec modulo
 def pow_mod(base, degree, module):

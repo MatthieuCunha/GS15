@@ -1,3 +1,5 @@
+# coding=utf-8
+
 #code récupéré sur github car je comprends rien a l'algo de toute facon.
 
 from random import randrange
@@ -8,6 +10,7 @@ from hashlib import sha1
 N = 160
 L = 1024
 
+#generation des parametres et des nombres premier du code github, pas de la fonction makePKI, car celle ci est bien plus rapide
 def generate_p_q(L, N):
     g = N  # g >= 160
     n = (L - 1) // g
@@ -89,7 +92,7 @@ def verify(M, r, s, p, q, g, y):
     if not validate_sign(r, s, q):
         return False
     try:
-        w = invert(s, q)
+        w = invert(xmpz(s), xmpz(q))
     except ZeroDivisionError:
         return False
     m = int(sha1(M).hexdigest(), 16)
@@ -111,9 +114,9 @@ def validate_params(p, q, g):
 
 
 def validate_sign(r, s, q):
-    if r < 0 and r > q:
+    if int(r) < 0 and int(r) > int(q):
         return False
-    if s < 0 and s > q:
+    if int(s) < 0 and int(s) > int(q):
         return False
     return True
 
@@ -123,7 +126,20 @@ x, y = generate_keys(g, p, q)
 
 
 def signer(texte):
-    r, s = sign(M, p, q, g, x)
-    print(r)
-    print(s)
+    r, s = sign(texte.encode(), p, q, g, x)
+    print('r= '+str(r))
+    print('s= '+str(s))
+    signature = open("signature", "w")
+    signature.write(str(r) + "\n")
+    signature.write(str(s))
     return r, s
+
+def verifierSignature(texte):
+    signature = open("signature", "r")
+    r=int(signature.readline())
+    s=int(signature.readline())
+    conforme=verify(texte.encode(),r,s,p,q,g,y)
+    if(conforme):
+        print('signature valide')
+    else:
+        print('signature invalide')

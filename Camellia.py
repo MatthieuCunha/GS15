@@ -1,4 +1,4 @@
-
+# coding=utf-8
 
 keySize=128 # nombre de bit attendu pour la clé
 k=0 # key used by camellia

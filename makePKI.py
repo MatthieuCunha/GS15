@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from random import getrandbits, randrange
 from secrets import randbits
 
@@ -59,7 +61,7 @@ def createPrime():
     while isPrime==False:
         number = randbits(tailleP)
         number = (number & ~1) | 1 #passe le LSB a 1 pour eviter les nombres pair
-        print("*",end="", flush=True)
+        print('*',end='', flush=True)
         if rabinMiller(number) and strongPrime(number):
             isPrime=True
 

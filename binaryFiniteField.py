@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from functools import reduce
 
 # constants used in the multGF2 function

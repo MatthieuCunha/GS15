@@ -1,7 +1,9 @@
+# coding=utf-8
+
 from makePKI import createPKI
 from SendSecretKey import createSecret
 from Camellia import camellia
-from Signature import signer, verifierSign
+from Signature import signer,verifierSignature
 
 # fonction qui fera office de retour au menu
 def introduction():
@@ -36,9 +38,12 @@ def introduction():
             print('Signature message')
             texteFile = open("baseTexte.txt", "r")
             texte=texteFile.read()
-            signer(M)
+            signer(texte)
         elif choice=='7':
             print('Verification Signature')
+            texteFile = open("baseTexte.txt", "r")
+            texte = texteFile.read()
+            verifierSignature(texte)
         elif choice=='8':
             print('tout ? maybe ?')
         elif choice=='9':
