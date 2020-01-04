@@ -11,12 +11,12 @@ MASK32  = 0xffffffff
 MASK64  = 0xffffffffffffffff
 MASK128 = 0xffffffffffffffffffffffffffffffff
 
-Sigma1 = 0xA09E667F3BCC908B
-Sigma2 = 0xB67AE8584CAA73B2
-Sigma3 = 0xC6EF372FE94F82BE
-Sigma4 = 0x54FF53A5F1D36F1C
-Sigma5 = 0x10E527FADE682D1D
-Sigma6 = 0xB05688C2B3E6C1FD
+Sigma1 = bin(0xA09E667F3BCC908B)
+Sigma2 = bin(0xB67AE8584CAA73B2)
+Sigma3 = bin(0xC6EF372FE94F82BE)
+Sigma4 = bin(0x54FF53A5F1D36F1C)
+Sigma5 = bin(0x10E527FADE682D1D)
+Sigma6 = bin(0xB05688C2B3E6C1FD)
 
 # adapte la taille la cle échanger avec diffie hellman, par decoupe ou padding selong les parametres
 def resizeKey(fullK):
@@ -45,7 +45,31 @@ def rotateLeft(num, bits):
 	return num
 
 def xor(s1, s2):
-    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
+	if(isinstance(s2,int)):
+		s2=bin(s2)
+	if(isinstance(s1,int)):
+		s1=bin(s1)
+	return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
+
+# string to binary
+def stobin(s):
+    return ''.join('{:08b}'.format(ord(c)) for c in s)
+
+
+# binary to int
+def bintoint(s):
+    return int(s, 2)
+
+
+# int to binary
+def itobin(i):
+    return bin(i)
+
+
+# binary to string
+def bintostr(b):
+    n = int(b, 2)
+    return ''.join(chr(int(b[i: i + 8], 2)) for i in xrange(0, len(b), 8))
 
 # substitu la tValue par le resultat correspondant a la sbox, a faire plus tard si j'y pense
 def SBOX(boxNumber,tValue):
@@ -53,7 +77,7 @@ def SBOX(boxNumber,tValue):
 
 # fonction F de la doc, sans doute util a quelque chose
 def F(F_IN, KE):
-	 x=F_IN ^ KE
+	 x= xor(F_IN, KE)
 	 t1 =  x >> 56
 	 t2 = (x >> 48) & MASK8
 	 t3 = (x >> 40) & MASK8
@@ -132,32 +156,32 @@ def camelliaEncrypt():
   D1 = D1 ^ F(D2, Sigma6)
   KB = (D1 << 64) | D2
 
-  kw1 = KL  >> 64
-  kw2 = KL  & MASK64
-  k1  = KA  >> 64
-  k2  = KA  & MASK64
-  k3  = rotateLeft(KL ,  15) >> 64
-  k4  = rotateLeft(KL ,  15) & MASK64
-  k5  = rotateLeft(KA ,  15) >> 64
-  k6  = rotateLeft(KA ,  15) & MASK64
-  ke1 = rotateLeft(KA ,  30) >> 64
-  ke2 = rotateLeft(KA ,  30) & MASK64
-  k7  = rotateLeft(KL ,  45) >> 64
-  k8  = rotateLeft(KL ,  45) & MASK64
-  k9  = rotateLeft(KA ,  45) >> 64
-  k10 = rotateLeft(KL ,  60) & MASK64
-  k11 = rotateLeft(KA ,  60) >> 64
-  k12 = rotateLeft(KA ,  60) & MASK64
-  ke3 = rotateLeft(KL ,  77) >> 64
-  ke4 = rotateLeft(KL ,  77) & MASK64
-  k13 = rotateLeft(KL ,  94) >> 64
-  k14 = rotateLeft(KL ,  94) & MASK64
-  k15 = rotateLeft(KA ,  94) >> 64
-  k16 = rotateLeft(KA ,  94) & MASK64
-  k17 = rotateLeft(KL , 111) >> 64
-  k18 = rotateLeft(KL , 111) & MASK64
-  kw3 = rotateLeft(KA , 111) >> 64
-  kw4 = rotateLeft(KA , 111) & MASK64
+  kw1 =bin( KL  >> 64)
+  kw2 =bin( KL  & MASK64)
+  k1  =bin( KA  >> 64)
+  k2  =bin( KA  & MASK64)
+  k3  =bin( rotateLeft(KL ,  15) >> 64)
+  k4  =bin( rotateLeft(KL ,  15) & MASK64)
+  k5  =bin( rotateLeft(KA ,  15) >> 64)
+  k6  =bin( rotateLeft(KA ,  15) & MASK64)
+  ke1 =bin( rotateLeft(KA ,  30) >> 64)
+  ke2 =bin( rotateLeft(KA ,  30) & MASK64)
+  k7  =bin( rotateLeft(KL ,  45) >> 64)
+  k8  =bin( rotateLeft(KL ,  45) & MASK64)
+  k9  =bin( rotateLeft(KA ,  45) >> 64)
+  k10 =bin( rotateLeft(KL ,  60) & MASK64)
+  k11 =bin( rotateLeft(KA ,  60) >> 64)
+  k12 =bin( rotateLeft(KA ,  60) & MASK64)
+  ke3 =bin( rotateLeft(KL ,  77) >> 64)
+  ke4 =bin( rotateLeft(KL ,  77) & MASK64)
+  k13 =bin( rotateLeft(KL ,  94) >> 64)
+  k14 =bin( rotateLeft(KL ,  94) & MASK64)
+  k15 =bin( rotateLeft(KA ,  94) >> 64)
+  k16 =bin( rotateLeft(KA ,  94) & MASK64)
+  k17 =bin( rotateLeft(KL , 111) >> 64)
+  k18 =bin( rotateLeft(KL , 111) & MASK64)
+  kw3 =bin( rotateLeft(KA , 111) >> 64)
+  kw4 =bin( rotateLeft(KA , 111) & MASK64)
 
   open('EncryptedTexte', 'w').close() # delete le contenu du message
   #lire le message et extraire des bloc de 128bit en boucle
@@ -167,14 +191,9 @@ def camelliaEncrypt():
   #découpe en 2 bloc de 64bit gauche et droite
 	   D1, D2 = texte[:int(len(texte)/2)], texte[int(len(texte)/2):]
 
-	   D1 = ''.join(format(ord(i), 'b') for i in D1)
-	   D1 = int(D1,2)
-	   D2 = ''.join(format(ord(i), 'b') for i in D2)
-	   D2 = int(D2,2)
-
 	   # tourné de feistel
-	   D1 = D1 ^ kw1          # Prewhitening
-	   D2 = D2 ^ kw2
+	   D1 = xor(D1, kw1)          # Prewhitening
+	   D2 = xor(D2, kw2)
 	   D2 = D2 ^ F(D1, k1)     # Round 1
 	   D1 = D1 ^ F(D2, k2)     # Round 2
 	   D2 = D2 ^ F(D1, k3)     # Round 3
@@ -328,10 +347,11 @@ def camellia():
 	resizeKey(fullK)
 	print('la clé redimensionné est '+str(k)) ## print de debug
 
-	print('Choix du mode 1)ECD 2)CBC 3)PCBC')
-	choice = int(input ('Option :'))
+	#camelliaEncrypt()
+	#print('Choix du mode 1)ECD 2)CBC 3)PCBC')
+	#choice = int(input ('Option :'))
 
 
 
-camelliaEncrypt()
+camellia()
 #camelliaDecrypt()

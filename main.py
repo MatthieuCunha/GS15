@@ -1,5 +1,7 @@
 from makePKI import createPKI
 from SendSecretKey import createSecret
+from Camellia import camellia
+from Signature import signer, verifierSign
 
 # fonction qui fera office de retour au menu
 def introduction():
@@ -28,9 +30,13 @@ def introduction():
             createSecret()
             print('Partage Clé secrete')
         elif choice=='5':
+            camellia()
             print('Chiffrement message')
         elif choice=='6':
             print('Signature message')
+            texteFile = open("baseTexte.txt", "r")
+            texte=texteFile.read()
+            signer(M)
         elif choice=='7':
             print('Verification Signature')
         elif choice=='8':
